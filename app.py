@@ -11,12 +11,14 @@ yt = YTMusic()
 app.secret_key = 'the random string'
 app.permanent_session_lifetime = timedelta(minutes=60)
 
-SPOTIFY_REDIRECT_URI = "http://localhost:5000/spotify/redirect/"
+# SPOTIFY_REDIRECT_URI = "http://localhost:5000/spotify/redirect/"
+SPOTIFY_REDIRECT_URI = "https://dawkrish.pythonanywhere.com/spotify/redirect/"
 SPOTIFY_CLIENT_ID = "408169d94bb04fa5976224d191be1d80"
 SPOTIFY_CLIENT_SECRET = "89dd40939ccf4c64800be659891e9884"
 SPOTIFY_SCOPE = "user-read-private user-read-email playlist-modify-public"
 
-YTM_REDIRECT_URI = "http://localhost:5000/ytm/redirect/"
+# YTM_REDIRECT_URI = "http://localhost:5000/ytm/redirect/"
+YTM_REDIRECT_URI = "https://dawkrish.pythonanywhere.com/ytm/redirect/"
 YTM_CLIENT_ID = "1041717439867-5pdrdovtic52i0l7ec31p44jsdi1hfop.apps.googleusercontent.com"
 YTM_CLIENT_SECRET = "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"
 YTM_SCOPE = "https://www.googleapis.com/auth/youtube"
