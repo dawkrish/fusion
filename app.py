@@ -78,7 +78,6 @@ def ytmuscic_to_spotify():
         s = spotify_search_song(t)
         if s is None:
             return redirect("/")
-        print(s)
         spotify_songs.append(s)
 
     created_playlist_id = spotify_create_playlist(playlist_title)
@@ -101,6 +100,7 @@ def spotify_to_ytmusic():
     print("----------------" + link)
     resp = spotify_hit_api("/playlists/" + link, method="GET")
     if resp is None:
+        print(resp.text)
         return redirect("/")
 
     playlist_name = resp["name"]
