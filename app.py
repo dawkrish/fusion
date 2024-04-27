@@ -55,9 +55,11 @@ def ytm_redirect_route():
 
 @app.route("/ytmusic-to-spotify", methods=["GET", "POST"])
 def ytmuscic_to_spotify():
+    print("-------------------DO WE COME HERE DO WE COME HERE AT ytmusic-to-spotify GET-------------------")
     if request.method == "GET":
         return render_template("ytmusic-to-spotify.html")
 
+    print("-------------------DO WE COME HERE DO WE COME HERE AT ytmusic-to-spotify POST-------------------")
     link = request.form["ytm-link"]
     resp = yt.get_playlist(link)
     tracks = resp["tracks"]
