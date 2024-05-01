@@ -178,6 +178,7 @@ def spotify_create_playlist(playlist_name, playlist_description):
     body = {"name": playlist_name, "description": playlist_description}
     resp_body = spotify_hit_api(endpoint, method="POST", body=body)
     if resp_body is None:
+        print("error in creating spotify playlist")
         return None
     playlist_id = resp_body["id"]
     print("created playlist id - > ", playlist_id)
@@ -327,6 +328,7 @@ def spotify_search_song(title):
     URL = f"{endpoint}q={title}&type={type}&limit={limit}"
     resp_body = spotify_hit_api(URL, method="GET")
     if resp_body is None:
+        print("error in searching songs!!")
         return None
     song_id = resp_body["tracks"]["items"][0]["uri"]
 
