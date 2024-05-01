@@ -232,7 +232,7 @@ def ytm_get_playlist_info(playlist_id):
         "Authorization": "Bearer " + session.get("ytm_access_token")
     }
 
-    req1 = re.get(f"https://www.googleapis.com/youtube/v3/playlists?part=snippet?id={playlist_id}",
+    req1 = re.get(f"https://www.googleapis.com/youtube/v3/playlists?part=snippet&id={playlist_id}",
                   headers=headers)
     if not req1.ok:
         print("error in playlist-GET request")
@@ -242,7 +242,7 @@ def ytm_get_playlist_info(playlist_id):
     resp = req1.json()
     title, description = resp["items"][0]["snippet"]["title"], resp["items"][0]["snippet"]["description"]
 
-    req2 = re.get(f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet?playlistId={playlist_id}",
+    req2 = re.get(f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}",
                   headers=headers)
     if not req2.ok:
         print("error in playlistItems-GET request")
