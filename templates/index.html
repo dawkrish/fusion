@@ -25,13 +25,12 @@
 <hr>
 <br>
 <h2>Authorize Status</h2>
-{% if session.get("spotify_access_token") !=  None %}
+{% if session.get("spotify_access_token") ==  None %}
     <h3>Spotify Authorization still left ⚠️⚠️</h3>
 {% else %}
     <h3>You have authorized Spotify ✅✅</h3>
 {% endif %}
-<br>
-{% if session.get("ytm_access_token") !=  None %}
+{% if session.get("ytm_access_token") ==  None %}
     <h3>YouTubeMusic Authorization still left ⚠️⚠️</h3>
 {% else %}
     <h3>You have authorized YouTubeMusic ✅✅</h3>
