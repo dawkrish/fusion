@@ -268,7 +268,7 @@ def ytm_get_playlist_info(playlist_id):
                 print(req2.text)
                 return None, None, None
 
-            tracks += resp["tracks"]
+            tracks += resp["items"]
             next_page_token = resp["nextPageToken"]
 
     return title, description, tracks
