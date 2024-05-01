@@ -61,18 +61,17 @@ def ytmuscic_to_spotify():
 
     print("-------------------DO WE COME HERE DO WE COME HERE AT ytmusic-to-spotify POST-------------------")
     link = request.form["ytm-link"]
-    resp = yt.get_playlist(link)
-    tracks = resp["tracks"]
-    playlist_title = resp["title"]
+    playlist_title, playlist_description, playlist_tracks = ytm_get_playlist_info(link)
+    if playlist_title is None or playlist_description is None or playlist_tracks is None:
+        return "this is wrong playlist ID, go back"
+
     print("----------------------------")
     titles = []
-    for t in tracks:
+    for t in playlist_tracks:
         titleArtist = ""
-        titleArtist += t["title"]
+        titleArtist += t["snippet"]["title"]
         titleArtist += "-"
-        for artist in t["artists"]:
-            titleArtist += artist["name"]
-            titleArtist += ","
+        titleArtist += t["snipper"]["description"]
         titles.append(titleArtist)
 
     spotify_songs = []
@@ -82,7 +81,7 @@ def ytmuscic_to_spotify():
             return redirect("/")
         spotify_songs.append(s)
 
-    created_playlist_id = spotify_create_playlist(playlist_title)
+    created_playlist_id = spotify_create_playlist(playlist_title, playlist_description)
     if created_playlist_id is None:
         return redirect("/")
     if spotify_add_songs_to_playlist(created_playlist_id, spotify_songs) is None:
@@ -171,11 +170,10 @@ def spotify_to_ytmusic():
     return render_template("ytmusic_playlist_created.html", data=data)
 
 
-
 def spotify_create_playlist(playlist_name):
     user_id = session.get("user_id")
     endpoint = f"/users/{user_id}/playlists"
-    body = {"name": playlist_name}
+    body = {"name": playlist_name, "description": playlist_description}
     resp_body = spotify_hit_api(endpoint, method="POST", body=body)
     if resp_body is None:
         return None
@@ -226,6 +224,30 @@ def ytm_access_token(authorization_code):
     print(req.text)
     resp = req.json()
     return resp.get("access_token")
+
+
+def ytm_get_playlist_info(playlist_id):
+    headers = {
+        "Authorization": "Bearer " + session.get("ytm_access_token")
+    }
+
+    req1 = re.get(f"https://www.googleapis.com/youtube/v3/playlists?part=snippet?id={playlist_id}",
+                  headers=headers)
+    if not req1.ok:
+        return None, None, None
+
+    resp = req1.json()
+    title, description = resp["items"][0]["snippet"]["title"], resp["items"][0]["snippet"]["description"]
+
+    req2 = re.get(f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet?playlistId={playlist_id}",
+                  headers=headers)
+    if not req2.ok:
+        return None, None, None
+
+    resp = req2.json()
+    tracks = resp["items"]
+
+    return title, description, tracks
 
 
 def spotify_generate_redirect_string(client_id, scope, redirect_uri):
