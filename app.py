@@ -260,7 +260,7 @@ def ytm_get_playlist_info(playlist_id):
         results_still_left = total_results - results_per_page
         iterations = (results_still_left // results_per_page) + 1
         next_page_token = resp["nextPageToken"]
-        for _ in iterations:
+        for _ in range(iterations):
             req2 = re.get(f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&pageToken={next_page_token}",
                           headers=headers)
             if not req2.ok:
