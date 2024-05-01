@@ -67,12 +67,13 @@ def ytmuscic_to_spotify():
         return "this is wrong playlist ID, go back"
 
     print("----------------------------")
+    print(playlist_title, playlist_description)
     titles = []
     for t in playlist_tracks:
         titleArtist = ""
         titleArtist += t["snippet"]["title"]
         titleArtist += "-"
-        titleArtist += t["snipper"]["description"]
+        titleArtist += t["snippet"]["description"]
         titles.append(titleArtist)
 
     spotify_songs = []
