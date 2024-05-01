@@ -253,6 +253,23 @@ def ytm_get_playlist_info(playlist_id):
 
     resp = req2.json()
     tracks = resp["items"]
+    total_results = resp["pageInfo"]["totalResults"]
+    results_per_page = resp["pageInfo"]["resultsPerPage"]
+
+    if total_results > results_per_page:
+        results_still_left = total_results - results_per_page
+        iterations = (results_still_left // results_per_page) + 1
+        next_page_token = resp["nextPageToken"]
+        for _ in iterations:
+            req2 = re.get(f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&pageToken={next_page_token}",
+                          headers=headers)
+            if not req2.ok:
+                print("error in playlistItems-GET request")
+                print(req2.text)
+                return None, None, None
+
+            tracks += resp["tracks"]
+            next_page_token = resp["nextPageToken"]
 
     return title, description, tracks
 
