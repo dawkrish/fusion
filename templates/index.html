@@ -6,32 +6,47 @@
     <title>Home</title>
 </head>
 <body>
-    <h3>Hello User</h3>
-    <h4>You need to authorize as both so that you can carry on the transfer process</h4>
-    {%if session.get("spotify_access_token") ==  None %}
+<h3>Hello User</h3>
+<h4>You need to authorize as both so that you can carry on the transfer process</h4>
+{% if session.get("spotify_access_token") ==  None %}
     <h3>Spotify Authorization <a href="{{ data["spotify_redirect_url"] }}">Click Here</a></h3>
-    {% else %}
-        <h3>You have authorized Spotify, if you want to again then <a href="{{ data["spotify_redirect_url"] }}">Click Here</a></h3>
-    {% endif %}
+{% else %}
+    <h3>You have authorized Spotify, if you want to again then <a href="{{ data["spotify_redirect_url"] }}">Click
+        Here</a></h3>
+{% endif %}
 
-    {%if session.get("ytm_access_token") ==  None %}
-        <h3>YouTubeMusic Authorization <a href="{{ data["ytm_redirect_url"] }}">Click Here</a></h3>
-    {% else %}
-        <h3>You have authorized YouTubeMusic, if you want to again then <a href="{{ data["ytm_redirect_url"] }}">Click Here</a></h3>
-    {% endif %}
+{% if session.get("ytm_access_token") ==  None %}
+    <h3>YouTubeMusic Authorization <a href="{{ data["ytm_redirect_url"] }}">Click Here</a></h3>
+{% else %}
+    <h3>You have authorized YouTubeMusic, if you want to again then <a href="{{ data["ytm_redirect_url"] }}">Click
+        Here</a></h3>
+{% endif %}
+<br>
+<hr>
+<br>
+<h2>Authorize Status</h2>
+{% if session.get("spotify_access_token") !=  None %}
+    <h3>Spotify Authorization still left ⚠️⚠️</h3>
+{% else %}
+    <h3>You have authorized Spotify ✅✅</h3>
+{% endif %}
+<br>
+{% if session.get("ytm_access_token") !=  None %}
+    <h3>YouTubeMusic Authorization still left ⚠️⚠️</h3>
+{% else %}
+    <h3>You have authorized YouTubeMusic ✅✅</h3>
+{% endif %}
+<br>
+<hr>
+<br>
+{% if session.get("spotify_access_token") != None and session.get("ytm_access_token") != None %}
+    <h3>As you have authorized for both Spotify and YouTubeMusic, so you can convert</h3>
     <br>
-    <hr>
-
-    <br>
-    {% if session.get("spotify_access_token") != None and session.get("ytm_access_token") != None %}
-        <h3>You have authorized for both Spotify and YouTubeMusic, so you can convert</h3>
-        <h3>Spotify To YouTubeMusic <a href="/spotify-to-ytmusic">click</a></h3>
-        <br>
-        <br>
-        <h3>YouTubeMusic To Spotify <a href="/ytmusic-to-spotify">click</a></h3>
-    {% endif %}
-    <br>
-    <br>
+    <h3>Spotify To YouTubeMusic <a href="/spotify-to-ytmusic">click</a></h3>
+    <h3>YouTubeMusic To Spotify <a href="/ytmusic-to-spotify">click</a></h3>
+{% endif %}
+<br>
+<br>
 
 
 </body>
