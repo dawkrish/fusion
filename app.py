@@ -2,6 +2,7 @@ import base64
 from datetime import timedelta
 
 import requests as re
+import requests.packages
 
 from ytmusicapi import YTMusic
 from flask import Flask, render_template, request, session, redirect
@@ -234,6 +235,8 @@ def ytm_get_playlist_info(playlist_id):
     req1 = re.get(f"https://www.googleapis.com/youtube/v3/playlists?part=snippet?id={playlist_id}",
                   headers=headers)
     if not req1.ok:
+        print("error in playlist-GET request")
+        print(req1.text)
         return None, None, None
 
     resp = req1.json()
@@ -242,6 +245,8 @@ def ytm_get_playlist_info(playlist_id):
     req2 = re.get(f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet?playlistId={playlist_id}",
                   headers=headers)
     if not req2.ok:
+        print("error in playlistItems-GET request")
+        print(req2.text)
         return None, None, None
 
     resp = req2.json()
