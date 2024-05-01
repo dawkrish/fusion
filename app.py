@@ -172,7 +172,7 @@ def spotify_to_ytmusic():
     return render_template("ytmusic_playlist_created.html", data=data)
 
 
-def spotify_create_playlist(playlist_name):
+def spotify_create_playlist(playlist_name, playlist_description):
     user_id = session.get("user_id")
     endpoint = f"/users/{user_id}/playlists"
     body = {"name": playlist_name, "description": playlist_description}
