@@ -168,7 +168,7 @@ def spotify_to_ytmusic():
     data = {
         "link": "https://music.youtube.com/playlist?list=" + created_playlist_id
     }
-    return render_template("ytmusic_playlist_created.html.html", data=data)
+    return render_template("ytmusic_playlist_created.html", data=data)
 
 
 
