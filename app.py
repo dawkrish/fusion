@@ -255,11 +255,15 @@ def ytm_get_playlist_info(playlist_id):
     tracks = resp["items"]
     total_results = resp["pageInfo"]["totalResults"]
     results_per_page = resp["pageInfo"]["resultsPerPage"]
-
+    print("total results -> ", total_results)
+    print("results per page -> ", results_per_page)
     if total_results > results_per_page:
         results_still_left = total_results - results_per_page
+        print("results stil left ->", results_still_left)
         iterations = (results_still_left // results_per_page) + 1
+        print("number of iteration -> ", iterations)
         next_page_token = resp["nextPageToken"]
+        print("initial next page token -> ", next_page_token)
         for _ in range(iterations):
             req2 = re.get(f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&pageToken={next_page_token}",
                           headers=headers)
@@ -270,6 +274,7 @@ def ytm_get_playlist_info(playlist_id):
 
             tracks += resp["items"]
             next_page_token = resp["nextPageToken"]
+            print("changed next page token -> ", next_page_token)
 
     return title, description, tracks
 
