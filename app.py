@@ -103,7 +103,6 @@ def spotify_to_ytmusic():
     print("----------------" + link)
     resp = spotify_hit_api("/playlists/" + link, method="GET")
     if resp is None:
-        print(resp.text)
         return redirect("/")
 
     playlist_name = resp["name"]
@@ -322,7 +321,7 @@ def spotify_hit_api(remainingURL, method="GET", body=None):
     resp = None
     if body is None:
         if method == "GET":
-            # print("did we come here ?")
+            print("did we come here ?")
             resp = re.get(baseURL + remainingURL, headers=headers)
         if method == "POST":
             resp = re.post(baseURL + remainingURL, headers=headers)
