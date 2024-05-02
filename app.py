@@ -115,6 +115,7 @@ def spotify_to_ytmusic():
     if not resp.ok:
         return "This playlist ID is invalid, go back and try another one!"
 
+    resp = resp.json()
     playlist_name = resp["name"]
     playlist_description = resp["description"]
     titles = []
