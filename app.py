@@ -265,13 +265,14 @@ def ytm_get_playlist_info(playlist_id):
         next_page_token = resp["nextPageToken"]
         print("initial next page token -> ", next_page_token)
         for _ in range(iterations):
-            req2 = re.get(f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&pageToken={next_page_token}",
+            req = re.get(f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&pageToken={next_page_token}",
                           headers=headers)
-            if not req2.ok:
+            if not req.ok:
                 print("error in playlistItems-GET request")
-                print(req2.text)
+                print(req.text)
                 return None, None, None
 
+            resp = req.json()
             tracks += resp["items"]
             next_page_token = resp["nextPageToken"]
             print("changed next page token -> ", next_page_token)
