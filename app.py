@@ -274,7 +274,7 @@ def ytm_get_playlist_info(playlist_id):
 
             resp = req.json()
             tracks += resp["items"]
-            next_page_token = resp["nextPageToken"]
+            next_page_token = resp.get("nextPageToken")
             print("changed next page token -> ", next_page_token)
 
     return title, description, tracks
