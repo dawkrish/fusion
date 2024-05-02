@@ -25,6 +25,14 @@ YTM_CLIENT_SECRET = "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"
 YTM_SCOPE = "https://www.googleapis.com/auth/youtube"
 
 
+@app.route("/privacy-policy")
+def privacy_policy():
+    return render_template("privacy_policy.html")
+
+@app.route("/terms-services")
+def privacy_policy():
+    return render_template("terms_services].html.html")
+
 @app.route('/')
 def hello_world():
     # print(session)
