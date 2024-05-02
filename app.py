@@ -30,7 +30,7 @@ def privacy_policy():
     return render_template("privacy_policy.html")
 
 @app.route("/terms-services")
-def privacy_policy():
+def terms_services():
     return render_template("terms_services].html.html")
 
 @app.route('/')
