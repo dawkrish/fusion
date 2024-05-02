@@ -104,6 +104,8 @@ def spotify_to_ytmusic():
     resp = spotify_hit_api("/playlists/" + link, method="GET")
     if resp is None:
         return redirect("/")
+    if not resp.ok:
+        return "This playlist ID is invalid, go back and try another one!"
 
     playlist_name = resp["name"]
     playlist_description = resp["description"]
@@ -175,10 +177,11 @@ def spotify_create_playlist(playlist_name, playlist_description):
     user_id = session.get("user_id")
     endpoint = f"/users/{user_id}/playlists"
     body = {"name": playlist_name, "description": playlist_description}
-    resp_body = spotify_hit_api(endpoint, method="POST", body=body)
-    if resp_body is None:
+    resp = spotify_hit_api(endpoint, method="POST", body=body)
+    if not resp.ok or resp is None:
         print("error in creating spotify playlist")
         return None
+    resp_body = resp.json()
     playlist_id = resp_body["id"]
     print("created playlist id - > ", playlist_id)
 
@@ -190,8 +193,10 @@ def spotify_add_songs_to_playlist(playlist_id, songs):
     body = {
         "uris": songs
     }
-    resp_body = spotify_hit_api(endpoint, method="POST", body=body)
-    return resp_body
+    resp = spotify_hit_api(endpoint, method="POST", body=body)
+    if not resp.ok:
+        return None
+    return resp
 
 
 def spotify_access_token(authorization_code):
@@ -264,8 +269,9 @@ def ytm_get_playlist_info(playlist_id):
         next_page_token = resp["nextPageToken"]
         print("initial next page token -> ", next_page_token)
         for _ in range(iterations):
-            req = re.get(f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&pageToken={next_page_token}",
-                          headers=headers)
+            req = re.get(
+                f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&pageToken={next_page_token}",
+                headers=headers)
             if not req.ok:
                 print("error in playlistItems-GET request")
                 print(req.text)
@@ -299,7 +305,8 @@ def ytm_generate_redirect_string(client_id, scope, redirect_uri):
 
 def spotify_authorized_user_id():
     endpoint = "/me"
-    resp_body = spotify_hit_api(endpoint, method="GET")
+    resp = spotify_hit_api(endpoint, method="GET")
+    resp_body = resp.json()
     return resp_body["id"]
 
 
@@ -334,13 +341,14 @@ def spotify_hit_api(remainingURL, method="GET", body=None):
             resp = re.post(baseURL + remainingURL, headers=headers, json=body)
 
     if not resp.ok:
-        print("-------------------")
+        print("--------------------")
         print(resp.json())
         print("--------------------")
-        session.pop("spotify_access_token")
-        return None
+        if resp.status_code == 401:
+            session.pop("spotify_access_token")
+            return None
 
-    return resp.json()
+    return resp
 
 
 def spotify_search_song(title):
@@ -348,10 +356,12 @@ def spotify_search_song(title):
     type = "track"
     limit = 1
     URL = f"{endpoint}q={title}&type={type}&limit={limit}"
-    resp_body = spotify_hit_api(URL, method="GET")
-    if resp_body is None:
+    resp = spotify_hit_api(URL, method="GET")
+    if resp is None or not resp.ok:
         print("error in searching songs!!")
         return None
+
+    resp_body = resp.json()
     song_id = resp_body["tracks"]["items"][0]["uri"]
 
     return song_id
