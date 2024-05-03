@@ -29,9 +29,11 @@ YTM_SCOPE = "https://www.googleapis.com/auth/youtube"
 def privacy_policy():
     return render_template("privacy_policy.html")
 
+
 @app.route("/terms-services")
 def terms_services():
     return render_template("terms_services.html")
+
 
 @app.route('/')
 def hello_world():
@@ -78,11 +80,11 @@ def ytmuscic_to_spotify():
     print(playlist_title, playlist_description)
     titles = []
     for t in playlist_tracks:
-        titleArtist = ""
-        titleArtist += t["snippet"]["title"]
-        titleArtist += "-"
+        title_artist = ""
+        title_artist += t["snippet"]["title"]
+        # titleArtist += "-"
         # titleArtist += t["snippet"]["description"]
-        titles.append(titleArtist)
+        titles.append(title_artist)
 
     spotify_songs = []
     for t in titles:
@@ -153,7 +155,6 @@ def spotify_to_ytmusic():
         return redirect("/")
     resp = req.json()
     created_playlist_id = resp["id"]
-    print("PLAYLIST HAS BEEN CREATED @!!!")
 
     for song in ytm_songs:
         body = {
@@ -171,10 +172,6 @@ def spotify_to_ytmusic():
             print(req.text)
             session.pop("ytm_access_token")
             return redirect("/")
-        # resp = req.json()
-        # # print("responseeeeeeeeeee")
-        # # print(resp)
-        # # print("responseeeeeeeeeee")
 
     data = {
         "link": "https://music.youtube.com/playlist?list=" + created_playlist_id
@@ -209,23 +206,23 @@ def spotify_add_songs_to_playlist(playlist_id, songs):
 
 
 def spotify_access_token(authorization_code):
-    baseURL = "https://accounts.spotify.com/api/token"
-    joinedString = f"{SPOTIFY_CLIENT_ID}:{SPOTIFY_CLIENT_SECRET}"
-    b64encodedString = base64.b64encode(joinedString.encode()).decode()
+    base_url = "https://accounts.spotify.com/api/token"
+    joined_string = f"{SPOTIFY_CLIENT_ID}:{SPOTIFY_CLIENT_SECRET}"
+    b64encoded_string = base64.b64encode(joined_string.encode()).decode()
     headers = {'content-type': 'application/x-www-form-urlencoded',
-               "Authorization": "Basic " + b64encodedString}
+               "Authorization": "Basic " + b64encoded_string}
     body = {
         "code": authorization_code,
         "redirect_uri": SPOTIFY_REDIRECT_URI,
         "grant_type": "authorization_code"
     }
-    req = re.post(baseURL, data=body, headers=headers)
+    req = re.post(base_url, data=body, headers=headers)
     resp = req.json()
     return resp.get("access_token")
 
 
 def ytm_access_token(authorization_code):
-    baseURL = "https://oauth2.googleapis.com/token"
+    base_url = "https://oauth2.googleapis.com/token"
     headers = {'content-type': 'application/x-www-form-urlencoded',
                }
     body = {
@@ -235,7 +232,7 @@ def ytm_access_token(authorization_code):
         "client_id": YTM_CLIENT_ID,
         "client_secret": YTM_CLIENT_SECRET
     }
-    req = re.post(baseURL, data=body, headers=headers)
+    req = re.post(base_url, data=body, headers=headers)
     print(req.ok)
     print(req.text)
     resp = req.json()
@@ -385,10 +382,7 @@ def ytm_search_song(title):
         print(req.text)
         return None
     resp = req.json()
-    # print("__________________")
-    # print("length of items ", len(resp["items"]))
-    # print(resp["items"][0])
-    # print("__________________")
+
     return resp["items"][0]["id"]["videoId"]
 
 
