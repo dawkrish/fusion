@@ -3,9 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>YouTubeMusic to Spotify</title>
+    <style>
+        span {
+            background-color: yellow;
+        }
+    </style>
 </head>
 <body>
-     Drop your YouTube music playlist link that you want to convert !
+<h2>Drop your YouTube music playlist link that you want to convert !</h2>
+<h3>A sample example https://music.youtube.com/playlist?list=<span>PL2HmNptGL2m966op9UPkPJTiTU3fVgEsC</span></h3>
+    <h3>You have to copy the yellow part of the link and paste it below</h3>
     <form action="/ytmusic-to-spotify" method="post">
         <label for="link">Youtube Music Playlist Link ID</label>
         <input type="text" name="ytm-link" required>

@@ -66,27 +66,25 @@ def ytm_redirect_route():
 
 @app.route("/ytmusic-to-spotify", methods=["GET", "POST"])
 def ytmuscic_to_spotify():
-    print("-------------------DO WE COME HERE DO WE COME HERE AT ytmusic-to-spotify GET-------------------")
     if request.method == "GET":
         return render_template("ytmusic-to-spotify.html")
 
-    print("-------------------DO WE COME HERE DO WE COME HERE AT ytmusic-to-spotify POST-------------------")
     link = request.form["ytm-link"]
     playlist_title, playlist_description, playlist_tracks = ytm_get_playlist_info(link)
+
     if playlist_title == "ERROR":
         return redirect("/")
     if playlist_title is None or playlist_description is None or playlist_tracks is None:
         return "this is wrong playlist ID, go back"
-
-    print("----------------------------")
     print(playlist_title, playlist_description, len(playlist_tracks))
+
     titles = []
     for t in playlist_tracks:
         title_artist = ""
         title_artist += t["snippet"]["title"]
         title_artist += "-"
         title_artist += t["snippet"]["videoOwnerChannelTitle"][:-8]
-        print(title_artist)
+        # print(title_artist)
         titles.append(title_artist)
 
     spotify_songs = []
@@ -138,6 +136,9 @@ def spotify_to_ytmusic():
         ytm_songs.append(ytm_search_song(t))
 
     print(ytm_songs)
+
+    if session.get("ytm_access_token") is None:
+        return redirect("/")
 
     headers = {
         "Authorization": "Bearer " + session.get("ytm_access_token")
