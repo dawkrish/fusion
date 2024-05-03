@@ -82,8 +82,8 @@ def ytmuscic_to_spotify():
     for t in playlist_tracks:
         title_artist = ""
         title_artist += t["snippet"]["title"]
-        # titleArtist += "-"
-        # titleArtist += t["snippet"]["description"]
+        title_artist += "-"
+        title_artist += t["snippet"]["description"][:15]
         titles.append(title_artist)
 
     spotify_songs = []
