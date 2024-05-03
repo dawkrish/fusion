@@ -73,6 +73,8 @@ def ytmuscic_to_spotify():
     print("-------------------DO WE COME HERE DO WE COME HERE AT ytmusic-to-spotify POST-------------------")
     link = request.form["ytm-link"]
     playlist_title, playlist_description, playlist_tracks = ytm_get_playlist_info(link)
+    if playlist_title == "ERROR":
+        return redirect("/")
     if playlist_title is None or playlist_description is None or playlist_tracks is None:
         return "this is wrong playlist ID, go back"
 
@@ -241,8 +243,11 @@ def ytm_access_token(authorization_code):
 
 
 def ytm_get_playlist_info(playlist_id):
+    token = session.get("ytm_access_token")
+    if token is None:
+        return "ERROR", "ERROR", "ERROR"
     headers = {
-        "Authorization": "Bearer " + session.get("ytm_access_token")
+        "Authorization": "Bearer " + token
     }
 
     req1 = re.get(f"https://www.googleapis.com/youtube/v3/playlists?part=snippet&id={playlist_id}",
