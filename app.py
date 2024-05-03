@@ -335,7 +335,6 @@ def spotify_hit_api(remainingURL, method="GET", body=None):
     resp = None
     if body is None:
         if method == "GET":
-            print("did we come here ?")
             resp = re.get(baseURL + remainingURL, headers=headers)
         if method == "POST":
             resp = re.post(baseURL + remainingURL, headers=headers)
@@ -371,7 +370,7 @@ def spotify_search_song(title):
     resp_body = resp.json()
     tracks = resp_body["tracks"]["items"]
     print("number of tracks searched : ", len(tracks))
-    print(tracks)
+    print(tracks[0]["name"], tracks[0]["artists"])
     song_id = resp_body["tracks"]["items"][0]["uri"]
 
     return song_id
