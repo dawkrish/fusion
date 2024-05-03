@@ -369,6 +369,9 @@ def spotify_search_song(title):
         return None
 
     resp_body = resp.json()
+    tracks = resp_body["tracks"]["items"]
+    print("number of tracks searched : ", len(tracks))
+    print(tracks)
     song_id = resp_body["tracks"]["items"][0]["uri"]
 
     return song_id
