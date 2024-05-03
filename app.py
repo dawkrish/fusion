@@ -77,7 +77,7 @@ def ytmuscic_to_spotify():
         return "this is wrong playlist ID, go back"
 
     print("----------------------------")
-    print(playlist_title, playlist_description)
+    print(playlist_title, playlist_description, len(playlist_tracks))
     titles = []
     for t in playlist_tracks:
         title_artist = ""
@@ -255,7 +255,7 @@ def ytm_get_playlist_info(playlist_id):
     resp = req1.json()
     title, description = resp["items"][0]["snippet"]["title"], resp["items"][0]["snippet"]["description"]
 
-    req2 = re.get(f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}",
+    req2 = re.get(f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&maxResults=50",
                   headers=headers)
     if not req2.ok:
         print("error in playlistItems-GET request")
@@ -277,7 +277,7 @@ def ytm_get_playlist_info(playlist_id):
         print("initial next page token -> ", next_page_token)
         for _ in range(iterations):
             req = re.get(
-                f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&pageToken={next_page_token}",
+                f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&pageToken={next_page_token}&maxResults=50",
                 headers=headers)
             if not req.ok:
                 print("error in playlistItems-GET request")
