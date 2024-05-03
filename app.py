@@ -362,6 +362,7 @@ def spotify_search_song(title):
     type = "track"
     limit = 1
     URL = f"{endpoint}q={title}&type={type}&limit={limit}"
+    print("URL -> ", URL)
     resp = spotify_hit_api(URL, method="GET")
     if resp is None or not resp.ok:
         print("error in searching songs!!")
@@ -369,8 +370,7 @@ def spotify_search_song(title):
 
     resp_body = resp.json()
     tracks = resp_body["tracks"]["items"]
-    print("number of tracks searched : ", len(tracks))
-    print(tracks[0]["name"], tracks[0]["artists"])
+    print(tracks[0]["name"], tracks[0]["artists"][0]["name"])
     song_id = resp_body["tracks"]["items"][0]["uri"]
 
     return song_id
