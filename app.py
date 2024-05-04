@@ -127,7 +127,7 @@ def spotify_to_ytmusic():
 
     if req is None or req.status_code == 401:
         return redirect("/")
-    if req.status_code != 200 or req.status_code != 201:
+    if req.status_code != 200 and req.status_code != 201:
         return f"This playlist ID is invalid, go back and try another one!\n\n{req.text}"
 
     resp = req.json()
@@ -206,7 +206,7 @@ def spotify_create_playlist(playlist_name, playlist_description):
     if req is None or req.status_code == 401:
         return "ERROR-01"
     print(req.text, req.status_code)
-    if req.status_code != 200 or req.status_code != 201:
+    if req.status_code != 200 and req.status_code != 201:
         return "ERROR-02"
 
     resp = req.json()
