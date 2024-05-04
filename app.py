@@ -317,7 +317,7 @@ def ytm_get_playlist_info(playlist_id):
             next_page_token = resp.get("nextPageToken")
             print("changed next page token -> ", next_page_token)
 
-    return title, description, tracks
+    return [title, description, tracks], None
 
 
 def spotify_generate_redirect_string(client_id, scope, redirect_uri):
