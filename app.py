@@ -19,7 +19,8 @@ SPOTIFY_CLIENT_SECRET = "89dd40939ccf4c64800be659891e9884"
 SPOTIFY_SCOPE = "user-read-private user-read-email playlist-modify-public"
 
 # YTM_REDIRECT_URI = "http://localhost:5000/ytm/redirect/"
-YTM_REDIRECT_URI = "https://dawkrish.pythonanywhere.com/ytm/redirect/"
+YTM_REDIRECT_URI = ("https://dawkrish.pythonanywhere.com/yt"
+                    "m/redirect/")
 YTM_CLIENT_ID = "1041717439867-5pdrdovtic52i0l7ec31p44jsdi1hfop.apps.googleusercontent.com"
 YTM_CLIENT_SECRET = "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"
 YTM_SCOPE = "https://www.googleapis.com/auth/youtube"
@@ -340,6 +341,7 @@ def ytm_generate_redirect_string(client_id, scope, redirect_uri):
 def spotify_authorized_user_id():
     endpoint = "/me"
     resp = spotify_hit_api(endpoint, method="GET")
+    print(resp.text)
     resp_body = resp.json()
     return resp_body["id"]
 
