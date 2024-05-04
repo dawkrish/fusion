@@ -2,13 +2,10 @@ import base64
 from datetime import timedelta
 
 import requests as re
-import requests.packages
 
-from ytmusicapi import YTMusic
 from flask import Flask, render_template, request, session, redirect
 
 app = Flask(__name__)
-yt = YTMusic()
 app.secret_key = 'the random string'
 app.permanent_session_lifetime = timedelta(minutes=60)
 
@@ -59,14 +56,14 @@ def spotify_redirect_route():
 @app.route("/ytm/redirect/")
 def ytm_redirect_route():
     code = request.args.get("code")
-    print("authorziation code -> ", code)
+    print("authorization code -> ", code)
     access_token = ytm_access_token(code)
     session["ytm_access_token"] = access_token
     return redirect("/")
 
 
 @app.route("/ytmusic-to-spotify", methods=["GET", "POST"])
-def ytmuscic_to_spotify():
+def ytmusic_to_spotify():
     if request.method == "GET":
         return render_template("ytmusic-to-spotify.html")
 
@@ -95,11 +92,8 @@ def ytmuscic_to_spotify():
         s = spotify_search_song(t)
         if s == "ERROR-01":
             return redirect("/")
-        if s is None:
-            #  SONG DOES NOT EXIST
-            continue
-
-        spotify_songs.append(s)
+        if s is not None:
+            spotify_songs.append(s)
 
     created_playlist_id = spotify_create_playlist(playlist_title, playlist_description)
     if created_playlist_id == "ERROR-01":
@@ -224,6 +218,7 @@ def spotify_add_songs_to_playlist(playlist_id, songs):
     req = spotify_hit_api(endpoint, method="POST", body=body)
     if req is None or req.status_code == 401:
         return None
+    print(req.json(), req.status_code)
     return req.json()
 
 
@@ -385,7 +380,7 @@ def spotify_search_song(title):
     resp = spotify_hit_api(URL, method="GET")
     if resp is None or resp.status_code == 401:
         return "ERROR-01"
-    if resp.status_code != 200 or resp.status_code != 201:
+    if resp.status_code != 200 and resp.status_code != 201:
         return None
 
     resp_body = resp.json()
