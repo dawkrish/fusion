@@ -205,7 +205,7 @@ def spotify_create_playlist(playlist_name, playlist_description):
     req = spotify_hit_api(endpoint, method="POST", body=body)
     if req is None or req.status_code == 401:
         return "ERROR-01"
-
+    print(req.text)
     if req.status_code != 200 or req.status_code != 201:
         return "ERROR-02"
 
