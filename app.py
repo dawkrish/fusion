@@ -346,7 +346,7 @@ def spotify_authorized_user_id():
     return resp_body["id"]
 
 
-def spotify_hit_api(remainingURL, method="GET", body=None):
+def spotify_hit_api(remaining_url, method="GET", body=None):
     baseURL = "https://api.spotify.com/v1"
     token = session.get("spotify_access_token")
 
@@ -361,15 +361,15 @@ def spotify_hit_api(remainingURL, method="GET", body=None):
     resp = None
     if body is None:
         if method == "GET":
-            resp = re.get(baseURL + remainingURL, headers=headers)
+            resp = re.get(baseURL + remaining_url, headers=headers)
         if method == "POST":
-            resp = re.post(baseURL + remainingURL, headers=headers)
+            resp = re.post(baseURL + remaining_url, headers=headers)
 
     else:
         if method == "GET":
-            resp = re.get(baseURL + remainingURL, headers=headers, json=body)
+            resp = re.get(baseURL + remaining_url, headers=headers, json=body)
         if method == "POST":
-            resp = re.post(baseURL + remainingURL, headers=headers, json=body)
+            resp = re.post(baseURL + remaining_url, headers=headers, json=body)
 
     if resp.status_code == 401:
         session.pop("spotify-access-token")
