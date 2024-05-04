@@ -70,12 +70,14 @@ def ytmuscic_to_spotify():
         return render_template("ytmusic-to-spotify.html")
 
     link = request.form["ytm-link"]
-    playlist_title, playlist_description, playlist_tracks = ytm_get_playlist_info(link)
+    playlist_info, error = ytm_get_playlist_info(link)
 
-    if playlist_title == "ERROR":
+    if error == "ERROR-01":
         return redirect("/")
-    if playlist_title is None or playlist_description is None or playlist_tracks is None:
+    if error == "ERROR-02":
         return "this is wrong playlist ID, go back"
+
+    playlist_title, playlist_description, playlist_tracks = playlist_info[0], playlist_info[1], playlist_info[2]
     print(playlist_title, playlist_description, len(playlist_tracks))
 
     titles = []
@@ -90,13 +92,20 @@ def ytmuscic_to_spotify():
     spotify_songs = []
     for t in titles:
         s = spotify_search_song(t)
-        if s is None:
+        if s == "ERROR-01":
             return redirect("/")
+        if s is None:
+            #  SONG DOES NOT EXIST
+            continue
+
         spotify_songs.append(s)
 
     created_playlist_id = spotify_create_playlist(playlist_title, playlist_description)
-    if created_playlist_id is None:
+    if created_playlist_id == "ERROR-01":
         return redirect("/")
+    if created_playlist_id == "ERROR-02":
+        return f"Some error creating spotify playlist :/ go back and try again"
+
     if spotify_add_songs_to_playlist(created_playlist_id, spotify_songs) is None:
         return redirect("/")
 
@@ -110,15 +119,17 @@ def ytmuscic_to_spotify():
 def spotify_to_ytmusic():
     if request.method == "GET":
         return render_template("spotify-to-ytmusic.html")
+
     link = request.form["spotify-link"]
     print("----------------" + link)
-    resp = spotify_hit_api("/playlists/" + link, method="GET")
-    if resp is None:
-        return redirect("/")
-    if not resp.ok:
-        return "This playlist ID is invalid, go back and try another one!"
+    req = spotify_hit_api("/playlists/" + link, method="GET")
 
-    resp = resp.json()
+    if req is None or req.status_code == 401:
+        return redirect("/")
+    if req.status_code != 200:
+        return f"This playlist ID is invalid, go back and try another one!\n\n{req.text}"
+
+    resp = req.json()
     playlist_name = resp["name"]
     playlist_description = resp["description"]
     titles = []
@@ -154,6 +165,7 @@ def spotify_to_ytmusic():
     }
     req = re.post("https://www.googleapis.com/youtube/v3/playlists?part=snippet,status", json=body, headers=headers)
     if not req.ok:
+        print("error creating ytm-playlist")
         print(req.text)
         session.pop("ytm_access_token")
         return redirect("/")
@@ -173,6 +185,7 @@ def spotify_to_ytmusic():
         }
         req = re.post("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet", json=body, headers=headers)
         if not req.ok:
+            print("error inserting ytm-song")
             print(req.text)
             session.pop("ytm_access_token")
             return redirect("/")
@@ -187,12 +200,16 @@ def spotify_create_playlist(playlist_name, playlist_description):
     user_id = session.get("user_id")
     endpoint = f"/users/{user_id}/playlists"
     body = {"name": playlist_name, "description": playlist_description}
-    resp = spotify_hit_api(endpoint, method="POST", body=body)
-    if not resp.ok or resp is None:
-        print("error in creating spotify playlist")
-        return None
-    resp_body = resp.json()
-    playlist_id = resp_body["id"]
+
+    req = spotify_hit_api(endpoint, method="POST", body=body)
+    if req is None or req.status_code == 401:
+        return "ERROR-01"
+
+    if req.status_code != 200:
+        return "ERROR-02"
+
+    resp = req.json()
+    playlist_id = resp["id"]
     print("created playlist id - > ", playlist_id)
 
     return playlist_id
@@ -203,10 +220,10 @@ def spotify_add_songs_to_playlist(playlist_id, songs):
     body = {
         "uris": songs
     }
-    resp = spotify_hit_api(endpoint, method="POST", body=body)
-    if not resp.ok:
+    req = spotify_hit_api(endpoint, method="POST", body=body)
+    if req is None or req.status_code == 401:
         return None
-    return resp
+    return req.json()
 
 
 def spotify_access_token(authorization_code):
@@ -246,7 +263,7 @@ def ytm_access_token(authorization_code):
 def ytm_get_playlist_info(playlist_id):
     token = session.get("ytm_access_token")
     if token is None:
-        return "ERROR", "ERROR", "ERROR"
+        return [], "ERROR-01"
     headers = {
         "Authorization": "Bearer " + token
     }
@@ -256,17 +273,21 @@ def ytm_get_playlist_info(playlist_id):
     if not req1.ok:
         print("error in playlist-GET request")
         print(req1.text)
-        return None, None, None
+        return [], "ERROR-02"
 
     resp = req1.json()
+    if len(resp["items"]) == 0:
+        return [], "ERROR-02"
+
     title, description = resp["items"][0]["snippet"]["title"], resp["items"][0]["snippet"]["description"]
 
-    req2 = re.get(f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&maxResults=50",
-                  headers=headers)
+    req2 = re.get(
+        f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={playlist_id}&maxResults=50",
+        headers=headers)
     if not req2.ok:
         print("error in playlistItems-GET request")
         print(req2.text)
-        return None, None, None
+        return [], "ERROR-02"
 
     resp = req2.json()
     tracks = resp["items"]
@@ -288,7 +309,7 @@ def ytm_get_playlist_info(playlist_id):
             if not req.ok:
                 print("error in playlistItems-GET request")
                 print(req.text)
-                return None, None, None
+                return [], "ERROR-02"
 
             resp = req.json()
             tracks += resp["items"]
@@ -335,9 +356,6 @@ def spotify_hit_api(remainingURL, method="GET", body=None):
         return None
     headers = {"Authorization": "Bearer " + token}
 
-    # print("************************")
-    # print(baseURL + remainingURL)
-    # print("************************")
     resp = None
     if body is None:
         if method == "GET":
@@ -349,16 +367,10 @@ def spotify_hit_api(remainingURL, method="GET", body=None):
         if method == "GET":
             resp = re.get(baseURL + remainingURL, headers=headers, json=body)
         if method == "POST":
-            print("we must have come here to create a playlist")
             resp = re.post(baseURL + remainingURL, headers=headers, json=body)
 
-    if not resp.ok:
-        print("--------------------")
-        print(resp.json())
-        print("--------------------")
-        if resp.status_code == 401:
-            session.pop("spotify_access_token")
-            return None
+    if resp.status_code == 401:
+        session.pop("spotify-access-token")
 
     return resp
 
@@ -368,16 +380,16 @@ def spotify_search_song(title):
     type = "track"
     limit = 1
     URL = f"{endpoint}q={title}&type={type}&limit={limit}"
-    print("URL -> ", URL)
     resp = spotify_hit_api(URL, method="GET")
-    if resp is None or not resp.ok:
-        print("error in searching songs!!")
+    if resp is None or resp.status_code == 401:
+        return "ERROR-01"
+    if resp.status_code != 200:
         return None
 
     resp_body = resp.json()
     tracks = resp_body["tracks"]["items"]
-    print(tracks[0]["name"], tracks[0]["artists"][0]["name"])
-    song_id = resp_body["tracks"]["items"][0]["uri"]
+    # print(tracks[0]["name"], tracks[0]["artists"][0]["name"])
+    song_id = tracks[0]["uri"]
 
     return song_id
 
