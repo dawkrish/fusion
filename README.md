@@ -26,3 +26,6 @@ So essentially we create a playlist in the YouTube account and the same playlist
 ### Same process is for YouTube Music to Spotify with some slight changes 
 
 This app is made in python with the `Flask` framework which helps up spinning a server, storing access tokens, route matching and etc.
+
+### Note
+We haven't used dotenv files as this a test and hobby project
